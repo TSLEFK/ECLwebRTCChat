@@ -1,0 +1,48 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    link(href="./stylesheets/index.css" , rel="stylesheet" , type="text/css")
+    script(src="./javascripts/jquery-1.11.1.js" , rel="text/javascript")
+    script(src="./javascripts/jquery.cookie.js" , rel="text/javascript")
+    script(src="./javascripts/webrtc.io.js" , rel="text/javascript")
+  body(onload="init()")
+    #container
+      #leftcontents
+        #my_video.M10-0
+          h1
+            User Video
+          video#me.flip.one_video(autoplay muted)
+        #myimage.M10-0
+          h1
+            User Image
+          canvas#image
+        #login_user.M10-0
+          h1
+            Login Users
+          table
+            tbody
+              tr
+                td
+                  #userAAAAAA
+                   img.userimg(src="")
+                   h2
+                     |username
+                td
+                  #userBBBBBBB
+                   img.userimg(src="")
+                   h2
+                     |username
+              tr
+                td
+                  #userCCCCC
+                   img.userimg(src="")
+                   h2
+                     |username
+      //leftcontents
+      #rightcontents
+         .video.M10-0
+           video#you.flip.one_video(autoplay)
+      //rightcontents
+    //container
+    script(src="./javascripts/client.js")

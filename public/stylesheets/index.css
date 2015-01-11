@@ -1,0 +1,128 @@
+@charset "utf-8";
+
+*{
+        line-height: 14px;
+        font: 14px "Lucida Granade", Helvetica, Arial, sans-self;;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+}
+
+html, body {
+        height: 100%;
+        width: 590px;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+#container{
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;/*safari*/
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+}
+
+
+/*
+        左側のコンテンツ
+*/
+#leftcontents{
+        float: left;
+        margin: 10px;
+        width: 200px;
+}
+
+/*自分側のビデオ映像*/
+#my_video {
+        width: 198px;
+        height: 218px;
+        border: solid 1px;
+        border-radius: 10px;
+}
+
+#me{
+        width: 180px;
+        height: 180px;
+        background-color: black;
+}
+
+/*自分のイメージ*/
+#myimage{
+        width: 198px;
+        height: 140px;
+        border: solid 1px;
+        border-radius: 10px;
+}
+
+#image{
+        width: 100px;
+        height: 100px;
+        background-color: black;
+        margin: 0 auto;
+}
+
+/*ログインしている人達のイメージ*/
+#login_user{
+        width: 198px;
+        height: auto;
+        border: solid 1px;
+        border-radius: 10px;
+}
+
+.userimg{
+        width: 50px;
+        height: 50px;
+        background-color: black;
+}
+
+table{
+        width: 180px;
+        margin:  0 auto;
+}
+
+td div{
+        border: dashed 1px;
+        cursor: pointer;
+        display: block;
+        margin: 5px;
+}
+
+td div:hover{
+        opacity: 0.7;
+}
+
+/*
+        右側のコンテンツ
+*/
+#rightcontents{
+        width: 350px;
+        float: right;
+        margin: 10px;
+}
+
+.video{
+        width: 350px;
+        height: 350px;
+}
+
+#you{
+        width: 350px;
+        height: 350px;
+        background-color: black;
+}
+
+video{
+        
+        margin: 0 auto;
+}
+
+.M10-0{
+        margin: 10px 0;
+}

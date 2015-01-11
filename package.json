@@ -1,0 +1,19 @@
+{
+  "name": "ecl-videochat",
+  "version": "0.0.1",
+  "description": "VideoChatOnNodejs",
+  
+  "private": true,
+  "scripts": {
+    "start": "node sever"
+  },
+  "author": "TSLEFK",
+  "dependencies": {
+    "express": "4.10.4",
+    "jade": "1.8.1",
+    "webrtc.io": "0.0.4",
+    "webrtc.io-client": "0.0.2-3",
+    "ws": "0.6.3",
+    "socket.io": "1.2.1"
+  }
+}
