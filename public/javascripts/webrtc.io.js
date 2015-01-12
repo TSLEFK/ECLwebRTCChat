@@ -257,9 +257,7 @@ if (navigator.webkitGetUserMedia) {
 
     pc.onaddstream = function(event) {
       // TODO: Finalize this API
-    console.log("When this do?. event-> " + event);
       rtc.fire('add remote stream', event.stream, id);
-      console.log("after addiing ??");
     };
 
     if (rtc.dataChannelSupport) {

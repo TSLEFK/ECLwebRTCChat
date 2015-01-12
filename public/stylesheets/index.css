@@ -118,8 +118,16 @@ td div:hover{
         background-color: black;
 }
 
-video{
-        
+.button{
+        width: 200px;
+        height: 50px;
+        line-height: 50px;
+        border: solid 1px;
+        border-radius: 10px;
+        margin: 20px;
+}
+
+video
         margin: 0 auto;
 }
 

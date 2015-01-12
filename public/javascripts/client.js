@@ -10,74 +10,22 @@
       || navigator.webkitGetUserMedia
       || navigator.mozGetUserMedia
       ||  navigator.msGetUserMedia;
-  
-  function getNumPerRow() {
-    var len = videos.length;
-    var biggest;
-  
-    // Ensure length is even for better division.
-    if(len % 2 === 1) {
-      len++;
-    }
-  
-    biggest = Math.ceil(Math.sqrt(len));
-    while(len % biggest !== 0) {
-      biggest++;
-    }
-    return biggest;
-  }
-  
-  function subdivideVideos() {
-    var perRow = getNumPerRow();
-    var numInRow = 0;
-    for(var i = 0, len = videos.length; i < len; i++) {
-      var video = videos[i];
-      setWH(video, i);
-      numInRow = (numInRow + 1) % perRow;
-    }
-  }
-  
-  //削除
-  function setWH(video, i) {
-    var perRow = getNumPerRow();
-    var perColumn = Math.ceil(videos.length / perRow);
-    var width = window.innerWidth;
-    var height = window.innerHeight / 2;
-    video.width = 320;//width;
-    video.height = 300;//height;
-    video.style.visibility = "visible";
-  }
-  
-  //ビデオを表示させるタグを作る
-  function cloneVideo(domId, socketId) {
-    var video = document.getElementById(domId);
-    var clone = video.cloneNode(false);
-    clone.id = "remote" + socketId;
-    document.getElementById('videos').appendChild(clone);
-    videos.push(clone);
-    return clone;
-  }
-  
-  function callClone(stream , socketId) {
-    console.log("start callClone. socketId->" + socketId);
-    console.log("this.stream" + stream);
-    var clone = cloneVideo('you', socketId);
-    document.getElementById(clone.id).setAttribute("class", "");
+
+  function settingVideo(stream , socketId){
+    var video = document.getElementById("you");
+    video.id = "remote" + socketId;
     //web.rtc.io - 373
-    rtc.attachStream(stream, clone.id);
+    rtc.attachStream(stream, video.id);
   }
+
   
-  function removeVideo(socketId) {
+ function removeVideo(socketId) {
     var video = document.getElementById('remote' + socketId);
     if(video) {
       console.log("videos.indexOf(video): -> " +videos.indexOf(video) );
       videos.splice(videos.indexOf(video), 1);
       video.parentNode.removeChild(video);
     }
-  }
-  
-  function sanitize(msg) {
-    return msg.replace(/</g, '&lt;');
   }
   
   function initUserId(){
@@ -98,7 +46,6 @@
         //user_idにcookieに保存された video_chat=XXXXをcookieからとりたい
         if((st = document.cookie.lastIndexOf("video_chat=")) != -1){
           user_id = $.cookie("video_chat");
-          console.log("user_id on cookie:-> " + user_id );
           rtc._socket.send(JSON.stringify({
             "eventName" : "update_userId",
             "data" : { "u_id" : user_id}
@@ -115,7 +62,6 @@
           waitForConnection(); //相手からの通信を待ち続ける
         },500);
       }
-      console.log("waitForConnection OK");
     };
   
     waitForConnection();
@@ -128,15 +74,6 @@
       $("#user_id").html("あなたの番号は<span id='mynumber'>" + receive.userId + "</span>です");
       $.cookie("video_chat", receive.userId , { expires: 30}) ;
       window.location.href="/#" + receive.userId;
-      
-      //IDの振り分け後の動作
-      //ログインしているユーザーを表示する
-      var list = receive.roomlist;
-      
-      for (key in list){
-         console.log("key" +  key );
-      }
-      
     });
   }
   
@@ -220,8 +157,6 @@
     };
     
     rtc.callUserList = function() {
-      console.log("callUserList");
-    //発火条件必要？
       users.send(JSON.stringify({
         "eventName" : "setUserlist",
         "data" : {}
@@ -230,15 +165,18 @@
     
     rtc.on("getUserlist" , function(){
       var receive = users.recv.apply(this,arguments);
+      tmpList =[];
       
       allUserList = receive.rooms;
       
       for(key in receive.rooms){
         if (key !="")
-          userList.push(key);
+          tmpList.push(key);
       }
       
-      console.log("login usersList -> " + userList);
+      userList = tmpList.filter( function(x, i, self){
+        return self.indexOf( x ) === i;
+      });
       createUsers();
     });
     
@@ -258,10 +196,7 @@
       alert('Your browser is not supported or you have to turn on flags. In chrome you go to chrome://flags and turn on Enable PeerConnection remember to restart chrome');
     }
     var room = window.location.hash.slice(1);
-  /*常にFじゃね？
-    if(rtc._socket)
-      console.log(rtc._socket.readyState);
-    */ 
+    
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], room);
     if(rtc._socket)
       console.log(rtc._socket.readyState);
@@ -270,8 +205,7 @@
     /* socketIDは相手のソケット番号*/
     rtc.on('add remote stream', function(stream, socketId) {
       console.log("ADDING REMOTE STREAM...");
-      callClone(stream , socketId);
-      subdivideVideos();
+      settingVideo(stream , socketId);
     });
     
     rtc.on('disconnect stream', function(data) {
@@ -279,21 +213,13 @@
       removeVideo(data);
     });
     
-    
-    //initNewRoom();
     initUserId();
     initList();
-    
     initTel();
     catchmyimg();
     //ユーザイメージの更新を行う
     setInterval( "catchmyimg()" , 120000);//5min:300000 1min:60000
-    //setInterval( "initList()" , 1000);
   }
-  
-  window.onresize = function(event) {
-    subdivideVideos();
-  };
   
   window.onunload = function(event){
     console.log("socket is closed.");
