@@ -472,8 +472,10 @@ if (navigator.webkitGetUserMedia) {
     rtc.addDataChannels();
     rtc.sendOffers();
     
+    //カメラの許可が出た後の動作
     //追加分　client.js-271
     catchmyimg();
+    rtc.callUserList();
       
     console.log("END sendOffer");
   });

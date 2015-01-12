@@ -112,7 +112,7 @@
         console.log("send!!");
       } else {
         setTimeout(function(){
-          waitForConnection(); //繋がらなかったら再接続
+          waitForConnection(); //相手からの通信を待ち続ける
         },500);
       }
       console.log("waitForConnection OK");
@@ -150,22 +150,23 @@
       },
       event: 'receive_tell'
     };
-  
-    $("#call").click( function(event) {
-      //num =相手の番号, my_id=自分の番号
-      var num = $("#number").val();
+    
+    //ユーザのdivはこの処理後追加のため、onを使用
+    $(document).on("click" , "div[id^=user] " , function(){
+      //id =相手の番号, my_id=自分の番号
+      userId = this.id;
+      var id = userId.substr(4);
       var my_id = window.location.hash.slice(1);
+      
       //rtcのsocketにJSONを送る
       tell.send(JSON.stringify({
         "eventName" : "call",
         "data" : {
-          "num" : num ,
-          "my_id" : my_id,
-          "stream" : stream_tmp
+          "num" : id ,
+          "my_id" : my_id
         }
       }));
-      document.getElementById("number").value = "";
-      console.log("partner number:-> " + num);
+      console.log("partner number:-> " + id);
     });
   
     rtc.on("receive_tell",function(){
@@ -173,7 +174,6 @@
       setTimeout(function(){
         alert(receive.room + "さんから" + receive.str);
         window.location.href='/#' + receive.room;
-        //callClone( receive.stream , receive.id);
       init();
         },2000);
     });
@@ -202,8 +202,47 @@
     rtc.on("disconnect_tell",function(){
       location.href = "/";
     });
+    
   }
   
+  var userList= [];
+  var allUserList =[];
+  
+  function initList() {
+    var users ={
+      send: function(data){
+        rtc._socket.send(data);
+      },
+      recv: function(data){
+        return data;
+      },
+      event: "getUserlist"
+    };
+    
+    rtc.callUserList = function() {
+      console.log("callUserList");
+    //発火条件必要？
+      users.send(JSON.stringify({
+        "eventName" : "setUserlist",
+        "data" : {}
+      }));
+    };
+    
+    rtc.on("getUserlist" , function(){
+      var receive = users.recv.apply(this,arguments);
+      
+      allUserList = receive.rooms;
+      
+      for(key in receive.rooms){
+        if (key !="")
+          userList.push(key);
+      }
+      
+      console.log("login usersList -> " + userList);
+      createUsers();
+    });
+    
+  }
   
   function init() {
     if(PeerConnection) {
@@ -240,12 +279,16 @@
       removeVideo(data);
     });
     
+    
     //initNewRoom();
     initUserId();
+    initList();
+    
     initTel();
     catchmyimg();
     //ユーザイメージの更新を行う
     setInterval( "catchmyimg()" , 120000);//5min:300000 1min:60000
+    //setInterval( "initList()" , 1000);
   }
   
   window.onresize = function(event) {
@@ -257,6 +300,7 @@
     rtc._socket.close();
   };
   
+  //ユーザーイメージの作成をする
   function catchmyimg(){
     setTimeout(function(){
       //canvasを使用する
@@ -269,3 +313,30 @@
       frame.drawImage( videoElement  , 0 , 0 );
     },5000);
   };
+  
+  //ログインユーザーを表示させるのタグ生成
+  function createUsers() {
+    //偶数の時のみ、<td>を生成する
+    //userList = [1,2,3,....]
+    var tmpnum = 0;
+    for( var id of  userList ){
+      //ソケットが入ってない=ログアウトしてる場合は、表示させない
+      if (allUserList[id] != "") {
+        //横２つずつで表示させるため
+        if ( tmpnum % 2 == 0) {
+          $("tbody").append("<tr>")
+        }
+        $("tr").append("<td>");
+        $("td:last").append( '<div id="user'+id+'" class="userbox" type="button">' );
+        $("td div:last").append('<img class="userimg">');
+        $("td div:last").append("<h2>"+id+"</h2>");
+        $("td div:last").append("</div>")
+        $("td div:last").append("</td>")
+        
+        if ( tmpnum % 2 == 1) {
+          $("tbody").append("</tr>")
+        }
+        tmpnum++;
+      }
+    }
+  }

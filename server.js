@@ -24,6 +24,18 @@ console.log("Server is listening on port " + port);
 //var user_numbers = 1000;
 var userList={}; // {num : socket }
 
+
+webRTC.rtc.on('setUserlist',function(data,socket){
+  console.log(webRTC.rtc.rooms);
+  socket.send(JSON.stringify({
+    "eventName" : "getUserlist",
+    "data" : {
+      "rooms" : webRTC.rtc.rooms
+    }
+  }));
+});
+
+
 webRTC.rtc.on('call',function(data,socket){
   var soc;
   for(key in userList){
